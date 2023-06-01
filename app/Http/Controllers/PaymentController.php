@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use http\Client\Request;
+use Illuminate\Http\Request;
+use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Stripe\Charge;
 
@@ -16,19 +17,27 @@ class PaymentController extends Controller
         // Récupérez le montant du paiement depuis la requête Angular
         $amount = $request->input('amount');
 
-        try {
             // Créez une charge avec les détails du paiement
             $charge = Charge::create([
                 'amount' => $amount,
                 'currency' => 'EUR', // Changez-le en fonction de votre devise
                 'source' => $request->input('token'), // Le jeton Stripe que vous avez reçu depuis le terminal de paiement
             ]);
+    }
 
-            // Redirigez l'utilisateur vers une page de succès
-            return redirect()->route('payment.success');
-        } catch (\Exception $e) {
-            // Gérez les erreurs de paiement ici
-            return redirect()->route('payment.error')->with('error', $e->getMessage());
-        }
+    public function createPaymentIntent(Request $request)
+    {
+        Stripe::setApiKey('sk_test_VePHdqKTYQjKNInc7u56JBrQ');
+
+        $amount = $request->input('amount');
+
+        // Créez un PaymentIntent avec les détails du paiement
+        $paymentIntent = PaymentIntent::create([
+            'amount' => $amount,
+            'currency' => 'eur',
+            // Autres détails du paiement
+        ]);
+
+        return response()->json(['client_secret' => $paymentIntent->client_secret]);
     }
 }

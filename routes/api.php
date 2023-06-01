@@ -18,5 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/process-payment', 'PaymentController@processPayment')->name('payment.process');
+Route::post('/process-payment', [\App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process');
+Route::post('/connection_token', [\App\Http\Controllers\TerminalController::class, 'generateConnectionToken']);
 
